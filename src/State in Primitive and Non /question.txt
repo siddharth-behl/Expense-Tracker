@@ -1,0 +1,67 @@
+so basically if the value is like a number or string or something then when the value changes directly it will be locally changed but the reference to the main current state  will refer to the intial value only until it is mutated by setState but if there is an array or object then if we change the values or sort the data directly it wont change the reference hence causing a mutation in the main state only without setState right?
+
+
+
+
+Q-> why is react not reacting to the state change when changed from ascending to descending ?
+A- as only the content is changed react reacts when reference is changed . 
+
+chatGPT ref ---> https://chatgpt.com/share/676a9c69-f65c-800f-b530-9f9a66422d1b
+
+
+why this is not showing me the numbers in descending?
+let [test, settest] = useState([1, 6, 3, 4, 2, 5]); //
+  let [count, setcount] = useState(0);
+
+  return (
+    <>
+      <button
+        onClick={() => {
+          test.sort((a, b) => a - b);
+
+          settest((prev) => {
+            return prev.sort((a, b) => b - a);
+          });
+        }}
+      >
+        {test}
+      </button>
+ChatGPT said:
+ChatGPT
+The issue here is with the mutability of the array in JavaScript, and how React manages state. Let me walk you through the problem and how to fix it.
+
+What’s happening in your code:
+test.sort((a, b) => a - b): This sorts the array in ascending order in-place. So, it mutates the original test array.
+settest((prev) => {...}): Inside this callback, you are calling prev.sort((a, b) => b - a), which sorts the array in descending order in-place, again modifying the original prev array.
+However, React doesn’t detect the change after in-place mutations like sort() because the array’s reference is unchanged. The reference remains the same, even though the contents of the array have been changed.
+
+What you should do:
+To solve this issue, you need to ensure that React gets a new reference for the array after sorting. The simplest way to do this is by using the spread operator to create a new copy of the array before sorting it.
+
+Fixed Code:
+javascript
+Copy code
+let [test, settest] = useState([1, 6, 3, 4, 2, 5]);
+let [count, setcount] = useState(0);
+
+return (
+  <>
+    <button
+      onClick={() => {
+        // Sort in ascending order by creating a new reference
+        const sortedAsc = [...test].sort((a, b) => a - b);
+
+        // Sort in descending order by creating a new reference
+        settest((prev) => [...prev].sort((a, b) => b - a));
+      }}
+    >
+      {test}
+    </button>
+  </>
+);
+What's changed:
+The array is now being copied with [...test] before calling sort(). This ensures that a new array reference is created, which is crucial for React to detect the change and trigger a re-render.
+When you call settest(), you're passing a new array reference (a new sorted array), so React will correctly detect the state change.
+Key Takeaway:
+React relies on the reference to detect state changes. Mutating an array or object in place doesn't change its reference, so React doesn't notice any changes.
+By using the spread operator ([...]), you're creating a new array reference, which forces React to re-render the component.

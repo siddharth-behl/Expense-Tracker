@@ -1,0 +1,37 @@
+Each time you call `testhook()`, it creates a **completely new and independent state**. This is because `testhook()` uses React's `useState`, which initializes a separate state instance for every invocation of the hook.
+
+In your code:
+
+```javascript
+let [test, settest] = testhook();
+let [test1, settest1] = testhook();
+```
+
+- `test` and `settest` refer to one state instance.
+- `test1` and `settest1` refer to another, completely separate state instance.
+
+### What happens when you modify the states?
+- If you call `settest((prev) => prev + 1)`, only the state associated with `test` will update.
+- If you call `settest1((prev) => prev + 1)`, only the state associated with `test1` will update.
+
+### Do the states overlap?
+No, the states do **not overlap**. They are entirely independent because each invocation of `testhook()` calls `useState()` separately, and `useState()` creates isolated state variables for that specific invocation.
+
+### Your Code Execution:
+```javascript
+useEffect(() => {
+  settest1((prev) => prev + 1);
+  settest((prev) => {
+    return prev + 1;
+  });
+}, []);
+```
+
+Here’s what happens step by step:
+1. `settest1((prev) => prev + 1)` updates only `test1` state.
+2. `settest((prev) => prev + 1)` updates only `test` state.
+
+The `console.log` statements after the `useEffect` will log the final updated values, but these updates will not overlap between `test` and `test1`.
+
+### Key Takeaway:
+The states are **completely separate**. Calling the custom `testhook` multiple times results in independent state variables. Changing one will not affect the other.
