@@ -9,3 +9,4 @@ Currently, two official plugins are available:
 # Expense-Tracker
 # Expense-Tracker
 # Expense-Tracker
+# Expense-Tracker
